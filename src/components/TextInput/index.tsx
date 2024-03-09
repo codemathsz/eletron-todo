@@ -1,19 +1,34 @@
+import { ChangeEventHandler } from 'react'
 import {FaSearch} from 'react-icons/fa'
 
 interface IProps{
-  placeholder: string,
+  placeholder?: string,
   icon: boolean,
+  label?: string,
   className: string,
+  value?: string,
+  onChange?: ChangeEventHandler<HTMLInputElement>,
 }
 
 export function TextInput (props: IProps){
   return(
-    <div className={`${props.className} flex items-center gap-2 bg-gray-150 border border-gray-250 outline-none px-2 py-1 rounded-lg text-gray-500 text-sm`}>
+    <div className='w-full flex flex-col gap-2'>
       {
-       props.icon && <FaSearch size={18} color='#777777'/>
+        props.label && <label>{props.label}</label>
       }
+      <div className={`${props.className} flex items-center gap-2 bg-gray-150 border border-gray-250 outline-none px-2 py-1 rounded-lg text-gray-500 text-sm`}>
+        {
+        props.icon && <FaSearch size={18} color='#777777'/>
+        }
 
-      <input type="text" className="!w-full bg-gray-150 outline-none p-2 rounded-lg text-gray-500 text-sm" placeholder={props.placeholder} />
+        <input
+          type="text"
+          className="!w-full bg-gray-150 outline-none p-2 rounded-lg text-gray-500 text-sm"
+          value={props.value}
+          placeholder={props.placeholder}
+          onChange={props.onChange}
+        />
+      </div>
     </div>
   )
 }
