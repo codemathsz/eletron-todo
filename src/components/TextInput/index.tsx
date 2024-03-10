@@ -1,4 +1,4 @@
-import { ChangeEventHandler } from 'react'
+import React, { ChangeEventHandler } from 'react'
 import {FaSearch} from 'react-icons/fa'
 
 interface IProps{
@@ -10,8 +10,9 @@ interface IProps{
   onChange?: ChangeEventHandler<HTMLInputElement>,
 }
 
-export function TextInput (props: IProps){
-  return(
+const TextInput = React.forwardRef<HTMLInputElement, IProps>((props, ref) => {
+  // seu código aqui
+  return (
     <div className='w-full flex flex-col gap-2'>
       {
         props.label && <label>{props.label}</label>
@@ -22,6 +23,7 @@ export function TextInput (props: IProps){
         }
 
         <input
+          ref={ref}
           type="text"
           className="!w-full bg-gray-150 outline-none p-2 rounded-lg text-gray-500 text-sm"
           value={props.value}
@@ -31,4 +33,6 @@ export function TextInput (props: IProps){
       </div>
     </div>
   )
-}
+});
+
+export default TextInput
