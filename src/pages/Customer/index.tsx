@@ -4,16 +4,16 @@ import { Button } from "../../components/Button";
 import TextInput  from "../../components/TextInput";
 import { CustomersContext } from "../../contexts/CustomerContext";
 import { useContextSelector } from "use-context-selector";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from '@hookform/resolvers/zod'
 import {Modal}  from "../../components/Modal";
 import * as z from 'zod'
 
 const formSchema = z.object({
-  name: z.string(),
-  phone: z.string(),
-  address: z.string(),
-  zipcode: z.string()
+  name: z.string().min(1, "Campo obrigatório."),
+  phone: z.string().min(1, "Campo obrigatório."),
+  address: z.string().min(1, "Campo obrigatório."),
+  zipcode: z.string().min(1, "Campo obrigatório.")
 })
 
 type formInputs = z.infer<typeof formSchema>
@@ -27,8 +27,8 @@ export function Customer() {
   )
 
   const {
-    register,
     handleSubmit,
+    control,
     formState: { isSubmitting },
   } = useForm<formInputs>({
     resolver: zodResolver(formSchema)
@@ -36,7 +36,6 @@ export function Customer() {
 
   const [showModal, setShowModal] = useState<boolean>(false);
   const [searchCustomer, setSearchCustomer] = useState<string>('')
-  const modalRef = useRef(null)
   const classTd = "col-span-1 flex justify-center items-center truncate"
 
 
@@ -49,9 +48,9 @@ export function Customer() {
     console.log("aqui");
   }
 
-  async function handleSendForm(event: any) {
-    event.preventDefault();
-    console.log(event);
+  async function handleSendForm(data:formInputs ) {
+
+    console.log(data);
   }
 
   const filteredCustomers = searchCustomer
@@ -108,34 +107,67 @@ export function Customer() {
       </div>
       {
         showModal && (
-            <Modal onClose={() => handleCloseForm()} onSubmit={handleSendForm}>
+            <Modal onClose={() => handleCloseForm()} onSubmit={handleSubmit(handleSendForm)} isSubmitting={isSubmitting}>
               <div className="w-full flex flex-col justify-center items-center gap-6">
-                <TextInput
-                  label="Nome:"
-                  icon={false}
-                  className="w-full"
-                  {...register('name')}
+                <Controller
+                  control={control}
+                  name="name"
+                  render={({ field, fieldState }) => (
+                    <TextInput
+                      ref={field.ref}
+                      value={field.value}
+                      onChange={field.onChange}
+                      label="Nome:"
+                      className="w-full"
+                      icon={false}
+                      error={fieldState.error}
+                    />
+                  )}
                 />
-                <div className="w-full flex justify-between items-center">
-                  <TextInput
-                    label="CEP:"
-                    icon={false}
-                    className="w-11/12"
-                    {...register('zipcode')}
+                <div className="w-full flex justify-between items-center gap-2">
+                  <Controller
+                    control={control}
+                    name="zipcode"
+                    render={({ field }) => (
+                      <TextInput
+                        ref={field.ref}
+                        value={field.value}
+                        onChange={field.onChange}
+                        label="CEP:"
+                        className="w-full"
+                        icon={false}
+                      />
+                    )}
                   />
-                  <TextInput
-                    label="Endereço:"
-                    icon={false}
-                    className="w-72"
-                    {...register('address')}
+                  <Controller
+                    control={control}
+                    name="address"
+                    render={({ field }) => (
+                      <TextInput
+                        ref={field.ref}
+                        value={field.value}
+                        onChange={field.onChange}
+                        label="Endereço:"
+                        className="w-full"
+                        icon={false}
+                      />
+                    )}
                   />
                 </div>
-                <TextInput
-                    label="Celular/Telefone:"
-                    icon={false}
-                    className="w-full"
-                    {...register('phone')}
-                  />
+                <Controller
+                  control={control}
+                  name="phone"
+                  render={({ field }) => (
+                    <TextInput
+                      ref={field.ref}
+                      value={field.value}
+                      onChange={field.onChange}
+                      label="Celular/Telefone:"
+                      className="w-full"
+                      icon={false}
+                    />
+                  )}
+                />
               </div>
             </Modal>
         )
