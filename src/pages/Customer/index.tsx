@@ -1,10 +1,22 @@
-import { useState } from "react";
+import { createRef, useRef, useState } from "react";
 import { Base } from "../../components/Base";
 import { Button } from "../../components/Button";
-import { TextInput } from "../../components/TextInput";
-import { Modal } from "../../components/Modal";
+import TextInput  from "../../components/TextInput";
 import { CustomersContext } from "../../contexts/CustomerContext";
 import { useContextSelector } from "use-context-selector";
+import { useForm } from "react-hook-form";
+import { zodResolver } from '@hookform/resolvers/zod'
+import {Modal}  from "../../components/Modal";
+import * as z from 'zod'
+
+const formSchema = z.object({
+  name: z.string(),
+  phone: z.string(),
+  address: z.string(),
+  zipcode: z.string()
+})
+
+type formInputs = z.infer<typeof formSchema>
 
 export function Customer() {
   const customers = useContextSelector(
@@ -13,12 +25,18 @@ export function Customer() {
       return context.customers
     }
   )
+
+  const {
+    register,
+    handleSubmit,
+    formState: { isSubmitting },
+  } = useForm<formInputs>({
+    resolver: zodResolver(formSchema)
+  })
+
   const [showModal, setShowModal] = useState<boolean>(false);
   const [searchCustomer, setSearchCustomer] = useState<string>('')
-  const [name, setName] = useState<string>('')
-  const [address, setAddress] = useState<string>('')
-  const [zipcode, setZipcode] = useState<string>('')
-  const [phone, setPhone] = useState<string>('')
+  const modalRef = useRef(null)
   const classTd = "col-span-1 flex justify-center items-center truncate"
 
 
@@ -26,16 +44,14 @@ export function Customer() {
     setSearchCustomer(event.target.value)
   }
 
-  const handleCloseForm = (event: any) => {
-    setName('')
-    setAddress('')
-    setZipcode('')
-    setPhone('')
+  const handleCloseForm = () => {
     setShowModal(false)
+    console.log("aqui");
   }
-  const handleSendForm = (event: any):void =>{
-    console.log(event.target.value);
 
+  async function handleSendForm(event: any) {
+    event.preventDefault();
+    console.log(event);
   }
 
   const filteredCustomers = searchCustomer
@@ -92,36 +108,36 @@ export function Customer() {
       </div>
       {
         showModal && (
-          <Modal onClose={() => handleCloseForm} onSubmit={() =>handleSendForm}>
-            <div className="w-full flex flex-col justify-center items-center gap-6">
-              <TextInput
-                label="Nome:"
-                icon={false}
-                className="w-full"
-                onChange={(event) => setName(event.target.value)}
-              />
-              <div className="w-full flex justify-between items-center">
+            <Modal onClose={() => handleCloseForm()} onSubmit={handleSendForm}>
+              <div className="w-full flex flex-col justify-center items-center gap-6">
                 <TextInput
-                  label="CEP:"
-                  icon={false}
-                  className="w-11/12"
-                  onChange={(event) => setZipcode(event.target.value)}
-                />
-                <TextInput
-                  label="Endereço:"
-                  icon={false}
-                  className="w-72"
-                  onChange={(event) => setAddress(event.target.value)}
-                />
-              </div>
-              <TextInput
-                  label="Celular/Telefone:"
+                  label="Nome:"
                   icon={false}
                   className="w-full"
-                  onChange={(event) => setPhone(event.target.value)}
+                  {...register('name')}
                 />
-            </div>
-          </Modal>
+                <div className="w-full flex justify-between items-center">
+                  <TextInput
+                    label="CEP:"
+                    icon={false}
+                    className="w-11/12"
+                    {...register('zipcode')}
+                  />
+                  <TextInput
+                    label="Endereço:"
+                    icon={false}
+                    className="w-72"
+                    {...register('address')}
+                  />
+                </div>
+                <TextInput
+                    label="Celular/Telefone:"
+                    icon={false}
+                    className="w-full"
+                    {...register('phone')}
+                  />
+              </div>
+            </Modal>
         )
 
       }
