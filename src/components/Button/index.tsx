@@ -8,6 +8,7 @@ interface IButtonProps{
   icon: boolean,
   onClick?: () => void,
   type?: ButtonHTMLAttributes<HTMLButtonElement>['type'];
+  disabled?: boolean;
 }
 
 export function Button(props: IButtonProps){
@@ -17,6 +18,7 @@ export function Button(props: IButtonProps){
       className={`${props.className} bg-blue text-white font-normal text-sm rounded-lg px-4 py-3 flex ${props.icon ? 'justify-between': 'justify-center'} items-center gap-2`}
       title={props.title}
       onClick={props.onClick}
+      disabled={props.disabled}
     >
       <p className='w-full'>{props.label}</p>
       {
