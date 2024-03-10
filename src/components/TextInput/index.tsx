@@ -8,10 +8,10 @@ interface IProps{
   className: string,
   value?: string,
   onChange?: ChangeEventHandler<HTMLInputElement>,
+  error?: any
 }
 
 const TextInput = React.forwardRef<HTMLInputElement, IProps>((props, ref) => {
-  // seu código aqui
   return (
     <div className='w-full flex flex-col gap-2'>
       {
@@ -31,6 +31,7 @@ const TextInput = React.forwardRef<HTMLInputElement, IProps>((props, ref) => {
           onChange={props.onChange}
         />
       </div>
+      {props.error && <p className="text-red-500 text-sm">Campo obrigatório.</p>}
     </div>
   )
 });
