@@ -103,7 +103,7 @@ export function Product(){
               filteredProducts.map((product, index) =>{
                 return(
                   <tr className={`w-full grid grid-cols-4 font-sans text-base font-medium border border-[#D9D9D9] py-2`} key={index}>
-                    <td className={classTd}><img className="w-20 h-20" src={`../../../../src/main/uploads/${product.id}/imagem.png`} alt="" /></td>
+                    <td className={classTd}><img className="w-4/5 h-auto max-h-32" src={require(`../../main/uploads/${product.id}/imagem.png`)} alt="" /></td>
                     <td className={classTd}>{product.name} </td>
                     <td className={classTd}>{product.price}</td>
                     <td className={classTd}>X</td>
