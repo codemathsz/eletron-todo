@@ -18,6 +18,7 @@ export function Modal({ onClose, onSubmit, children, isSubmitting }: IModalProps
         </div>
         <div className='w-full flex justify-between items-center gap-4 mb-2'>
           <Button
+            type='button'
             className='w-full !bg-white !border !border-[#802922] !text-[#802922] hover:!bg-[#802922] hover:!text-white disabled:cursor-not-allowed'
             label='Cancelar'
             icon={false}
