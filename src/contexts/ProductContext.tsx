@@ -17,6 +17,7 @@ interface ProductContextType {
   products: IProduct[],
   fetchProducts: () => Promise<void>
   createProduct: (img: File, name: string, price: string) => Promise<void>
+  deleteProduct: (id: string) => Promise<void>
 }
 
 export const ProductsContext = createContext({} as ProductContextType)
@@ -40,13 +41,20 @@ export function ProductProvider({children}:IProductProviderProps){
     formData.append('price', price);
 
     try {
-      const response = await API.post('/product', formData);
-      return response.data
+      await API.post('/product', formData);
+      await new Promise((resolve) => setTimeout(resolve, 1000));
     } catch (error) {
       throw error
     }
   },[])
 
+  const deleteProduct = useCallback(async (id: string) => {
+    try {
+      await API.delete(`/product/${id}`)
+    } catch (error) {
+      throw error
+    }
+  },[])
 
   useEffect(() => {
     fetchProducts()
@@ -57,7 +65,8 @@ export function ProductProvider({children}:IProductProviderProps){
       value={{
         products,
         fetchProducts,
-        createProduct
+        createProduct,
+        deleteProduct
       }}
     >
       {children}

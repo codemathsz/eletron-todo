@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Base } from "../../components/Base";
 import TextInput from "../../components/TextInput";
 import { Button } from "../../components/Button";
@@ -9,6 +9,7 @@ import { Controller, useForm } from "react-hook-form";
 import * as z from 'zod'
 import { zodResolver } from "@hookform/resolvers/zod";
 import InputFile from "../../components/InputFile";
+import { FaTrash } from 'react-icons/fa'
 
 const formSchema = z.object({
   id: z.string().optional(),
@@ -32,6 +33,11 @@ export function Product(){
     ProductsContext,
     (context) => context.fetchProducts
   )
+
+  const deleteProduct = useContextSelector(
+    ProductsContext,
+    (context) => context.deleteProduct
+  )
   const [showModal, setShowModal] = useState<boolean>(false);
   const [searchProduct, setSearchProduct] = useState<string>('')
   const [file, setFile] = useState<File>()
@@ -40,6 +46,7 @@ export function Product(){
     handleSubmit,
     control,
     formState: { isSubmitting },
+    reset,
   } = useForm<formInputs>({
     resolver: zodResolver(formSchema)
   })
@@ -49,13 +56,16 @@ export function Product(){
   }
 
   async function handleSendForm(data:formInputs ) {
-    console.log(data.img);
-
-    const response = await createProduct(data.img, data.name, data.price)
+    await createProduct(data.img, data.name, data.price)
     await fetchProducts()
+    reset()
+    handleCloseForm()
   }
 
-  console.log(products);
+  async function handleDeleteProduct(id: string): Promise<void>{
+    await deleteProduct(id)
+    await fetchProducts()
+  }
 
   const handleSearchChange = (event: any) =>{
     setSearchProduct(event.target.value)
@@ -66,6 +76,7 @@ export function Product(){
       product.name.toLowerCase().includes(searchProduct.toLowerCase())
     )
   : products;
+
   return(
     <Base>
       <div className="w-full flex justify-start items-center">
@@ -103,14 +114,24 @@ export function Product(){
               filteredProducts.map((product, index) =>{
                 return(
                   <tr className={`w-full grid grid-cols-4 font-sans text-base font-medium border border-[#D9D9D9] py-2`} key={index}>
-                    <td className={classTd}><img className="w-4/5 h-auto max-h-32" src={require(`../../main/uploads/${product.id}/imagem.png`)} alt="" /></td>
+                    <td className={classTd}>
+                      <img className="w-4/5 h-auto max-h-32" src={require(`../../main/uploads/${product.id}/imagem.png`)} alt="" />
+                    </td>
                     <td className={classTd}>{product.name} </td>
                     <td className={classTd}>{product.price}</td>
-                    <td className={classTd}>X</td>
+                    <td onClick={() => handleDeleteProduct(product.id!)} className="w-full max-w-14 mx-auto text-red-600 col-span-1 flex justify-center items-center truncate cursor-pointer" title="excluir produto">
+                      <FaTrash/>
+                    </td>
                   </tr>
-
                 )
               })
+            }
+            {
+              filteredProducts.length === 0 &&  (
+                <tr className="w-full mx-auto font-sans text-base font-medium border border-[#D9D9D9] py-4 !rounded-b-2xl">
+                  <td className='w-full mx-auto col-span-1 flex justify-center items-center truncate '>Nenhum produto encontrado.</td>
+                </tr>
+              )
             }
           </tbody>
         </table>
@@ -142,7 +163,7 @@ export function Product(){
                 render={({ field }) => (
                   <TextInput
                     ref={field.ref}
-                    value={field.value}
+                    value={field.value || ''}
                     onChange={field.onChange}
                     label="Nome:"
                     className="w-full"
@@ -156,7 +177,7 @@ export function Product(){
                 render={({ field }) => (
                   <TextInput
                     ref={field.ref}
-                    value={field.value}
+                    value={field.value || ''}
                     onChange={field.onChange}
                     label="Preço:"
                     className="w-full"
