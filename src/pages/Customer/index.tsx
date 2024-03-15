@@ -71,7 +71,7 @@ export function Customer() {
   async function handleSendForm(data:formInputs ) {
     await createCustomer(data)
     await fetchCustomers()
-    setShowModal(false)
+    handleCloseForm()
   }
 
   async function handleExcludeCustomer(data:formInputs):Promise<void>{
@@ -133,7 +133,7 @@ export function Customer() {
                   <td className={classTd}>
                     <div className="truncate">{customer.phone}</div>
                   </td>
-                  <td onClick={() => handleExcludeCustomer(customer)} className="w-full max-w-14 mx-auto col-span-1 flex justify-center items-center truncate cursor-pointer" title="excluir cliente">
+                  <td onClick={() => handleExcludeCustomer(customer)} className="w-full max-w-14 mx-auto text-red-600  col-span-1 flex justify-center items-center truncate cursor-pointer" title="excluir cliente">
                     <FaTrash/>
                   </td>
                 </tr>
