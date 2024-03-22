@@ -1,19 +1,12 @@
-/* eslint global-require: off, no-console: off, promise/always-return: off */
-
-/**
- * This module executes inside of electron's main process. You can start
- * electron renderer process from here and communicate with the other processes
- * through IPC.
- *
- * When running `npm run build` or `npm run build:main`, this file is compiled to
- * `./src/main.js` using webpack. This gives us some performance wins.
- */
 import path from 'path';
-import { app, BrowserWindow, shell, ipcMain } from 'electron';
+import { app, BrowserWindow, shell, ipcMain, globalShortcut } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
+import { execFile, spawn } from 'child_process';
+import './server'
+
 
 class AppUpdater {
   constructor() {
@@ -57,6 +50,21 @@ const installExtensions = async () => {
 };
 
 const createWindow = async () => {
+
+ /*  const backendProcess = spawn('node', ['../../release/app/dist/main/server.js']);
+
+  backendProcess.stdout.on('data', (data) => {
+    console.log(`Backend stdout: ${data}`);
+  });
+
+  backendProcess.stderr.on('data', (data) => {
+    console.error(`Backend stderr: ${data}`);
+  });
+
+  backendProcess.on('close', (code) => {
+    console.log(`Backend process exited with code ${code}`);
+  }); */
+
   if (isDebug) {
     await installExtensions();
   }
@@ -89,6 +97,15 @@ const createWindow = async () => {
     if (!mainWindow) {
       throw new Error('"mainWindow" is not defined');
     }
+
+    globalShortcut.register('CmdOrCtrl+Shift+I', () => {
+      mainWindow!.webContents.openDevTools();
+    });
+
+    globalShortcut.register('CmdOrCtrl+R', () => {
+      mainWindow!.webContents.reload()
+    });
+
     if (process.env.START_MINIMIZED) {
       mainWindow.minimize();
     } else {
@@ -109,14 +126,15 @@ const createWindow = async () => {
     return { action: 'deny' };
   });
 
+  mainWindow.webContents.on('did-finish-load', () => {
+
+  });
+
   // Remove this if your app does not use auto updates
   // eslint-disable-next-line
   new AppUpdater();
 };
 
-/**
- * Add event listeners...
- */
 
 app.on('window-all-closed', () => {
   // Respect the OSX convention of having the application in memory even

@@ -58,6 +58,8 @@ export function ProductProvider({children}:IProductProviderProps){
 
   useEffect(() => {
     fetchProducts()
+    console.log(products);
+
   },[])
 
   return(

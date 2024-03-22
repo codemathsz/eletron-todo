@@ -27,18 +27,24 @@ export function CustomerProvider({children}: ICustomerProviderProps){
   const [customers, setCustomers] = useState<ICustomer[]>([])
 
   const fetchCustomers  = useCallback(async (query?: string) => {
-    const { data } = await API.get('/customers', {
-      params: {
-        q: query
-      }
-    })
-    setCustomers(data)
+    try {
+      const { data } = await API.get('/customers', {
+        params: {
+          q: query
+        }
+      })
+      setCustomers(data)
+    } catch (error) {
+      console.error(error)
+      throw error
+    }
   }, [])
 
   const createCustomer = useCallback(async (data: ICustomer) => {
     try {
       await API.post('/customer', data)
     } catch (error) {
+      console.error(error)
       throw error
     }
   }, [])
@@ -47,12 +53,15 @@ export function CustomerProvider({children}: ICustomerProviderProps){
     try {
       await API.delete(`/customer/${data.id}`)
     } catch (error) {
+      console.error(error)
       throw error
     }
   },[])
 
   useEffect(() => {
     fetchCustomers()
+    console.log(customers);
+
   },[])
   return(
     <CustomersContext.Provider
